@@ -13,6 +13,19 @@ func handlerFollow(s *state, cmd command, user database.User) error {
 	}
 	url := cmd.args[0]
 
+	_, err := s.db.GetFeedByURL(context.Background(), url)
+	if err != nil {
+		// If feed doesn't exist, create it
+		_, err = s.db.CreateFeed(context.Background(), database.CreateFeedParams{
+			Name:   url, // Using URL as feed name for simplicity
+			Url:    url,
+			UserID: user.ID,
+		})
+		if err != nil {
+			return fmt.Errorf("create feed: %w", err)
+		}
+	}
+
 	ff, err := s.db.CreateFeedFollow(context.Background(), database.CreateFeedFollowParams{
 		Name: user.Name,
 		Url:  url,
