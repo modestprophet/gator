@@ -1,6 +1,6 @@
 # GATOR - RSS Feed Aggregator CLI
 
-#PREREQUISITES
+# PREREQUISITES
 PostgreSQL 13+ installed and running
 Go 1.16+ installed
 Basic command line experience
@@ -28,7 +28,7 @@ $ createdb gator
 # RUNNING
 Run the program:
 ```bash
-$ gator <command>
+$ ./gator <command>
 ```
 
 # MAIN COMMANDS
