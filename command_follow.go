@@ -36,3 +36,21 @@ func handlerFollowing(s *state, cmd command, user database.User) error {
 	}
 	return nil
 }
+
+func handlerUnfollow(s *state, cmd command, user database.User) error {
+	if len(cmd.args) != 1 {
+		return fmt.Errorf("usage: unfollow <feed-url>")
+	}
+	url := cmd.args[0]
+
+	err := s.db.DeleteFeedFollow(context.Background(), database.DeleteFeedFollowParams{
+		Name: user.Name,
+		Url:  url,
+	})
+	if err != nil {
+		return fmt.Errorf("delete feed follow: %w", err)
+	}
+
+	fmt.Printf("Stopped following %s\n", url)
+	return nil
+}

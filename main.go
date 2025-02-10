@@ -48,6 +48,7 @@ func main() {
 	cmds.register("feeds", handlerFeeds)
 	cmds.register("follow", middlewareLoggedIn(handlerFollow))
 	cmds.register("following", middlewareLoggedIn(handlerFollowing))
+	cmds.register("unfollow", middlewareLoggedIn(handlerUnfollow))
 
 	if len(os.Args) < 2 {
 		fmt.Println("Error: command required")
@@ -69,11 +70,4 @@ func main() {
 		fmt.Printf("Error: %v\n", err)
 		os.Exit(1)
 	}
-
-	// updatedCfg, err := config.Read()
-	// if err != nil {
-	// 	fmt.Printf("Failed to re-read config: %v", err)
-	// }
-
-	// fmt.Printf("Final configuration:\n%+v\n", updatedCfg)
 }
