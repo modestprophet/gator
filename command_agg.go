@@ -3,10 +3,13 @@ package main
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"os"
 	"os/signal"
 	"time"
+
+	"github.com/modestprophet/gator/internal/database"
 )
 
 func handlerAgg(s *state, cmd command) error {
@@ -67,6 +70,26 @@ func scrapeFeeds(s *state) error {
 
 	for _, item := range rssFeed.Channel.Items {
 		fmt.Printf("New post: %s\n", item.Title)
+	}
+
+	for _, item := range rssFeed.Channel.Items {
+		publishedAt, err := time.Parse(time.RFC1123Z, item.PubDate)
+		if err != nil {
+			// Try alternative format if needed
+			publishedAt = time.Now()
+		}
+
+		_, err = s.db.CreatePost(context.Background(), database.CreatePostParams{
+			Title:       item.Title,
+			Url:         item.Link,
+			Description: sql.NullString{String: item.Description, Valid: item.Description != ""},
+			PublishedAt: sql.NullTime{Time: publishedAt, Valid: true},
+			FeedID:      feed.ID,
+		})
+
+		if err != nil && !errors.Is(err, sql.ErrNoRows) {
+			fmt.Printf("Failed to save post: %v\n", err)
+		}
 	}
 
 	return nil
